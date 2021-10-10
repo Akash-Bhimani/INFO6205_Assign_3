@@ -4,10 +4,15 @@
 
 package edu.neu.coe.info6205.util;
 
+import edu.neu.coe.info6205.sort.elementary.InsertionSort;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.Random;
 
 import static edu.neu.coe.info6205.util.Utilities.formatWhole;
 
@@ -117,6 +122,90 @@ public class Benchmark_Timer<T> implements Benchmark<T> {
      */
     public Benchmark_Timer(String description, Consumer<T> f) {
         this(description, null, f, null);
+    }
+
+    public static void main(String[] args) {
+
+        InsertionSort ins_sort = new InsertionSort();
+
+        Benchmark_Timer<Integer[]> benchTimer = new Benchmark_Timer<>("Benchmark Test", null, (x) -> ins_sort.sort(x, 0, x.length), null);
+
+        //randomly ordered array
+        for(int i = 100; i < 20000; i = i*2) {
+            int j = i;
+            Supplier<Integer[]> supplier = () -> {
+                Random random = new Random();
+                Integer[] arr = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j);
+                }
+                return arr;
+            };
+            double time = benchTimer.runFromSupplier(supplier, 16);
+            System.out.println("Value of N: " + i + " Order Situation- Randomly Ordered" + " Time Taken: " + time);
+        }
+
+        System.out.println("______________________");
+
+        //ordered array
+        for(int i = 100; i < 20000; i = i*2) {
+            int j = i;
+            Supplier<Integer[]> supplier = () -> {
+                Random random = new Random();
+                Integer[] arr = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j*100);
+                }
+                Arrays.sort(arr);
+                return arr;
+            };
+            double time = benchTimer.runFromSupplier(supplier, 16);
+            System.out.println("Value of N: " + i + " Order Situation- Ordered" + " Time Taken: " + time);
+        }
+
+        System.out.println("______________________");
+
+        //partially ordered array
+        for(int i = 100; i < 20000; i = i*2) {
+            int j = i;
+            Supplier<Integer[]> supplier = () -> {
+                Random random = new Random();
+                Integer[] arr = new Integer[j];
+
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j*100);
+                }
+                Arrays.sort(arr);
+                int rearrange = (int) (0.5*j);
+                for(int i1 = 0; i1 < rearrange; i1++) {
+                    int index = random.nextInt(j);
+                    arr[index] = random.nextInt(j*100);
+                }
+                return arr;
+            };
+            double time = benchTimer.runFromSupplier(supplier, 16);
+            System.out.println("Value of N: " + i + " Order Situation- Partially Ordered" + " Time Taken: " + time);
+        }
+
+        System.out.println("______________________");
+
+        //reverse ordered
+        for(int i = 100; i < 20000; i = i*2) {
+            int j = i;
+            Supplier<Integer[]> supplier = () -> {
+                Random random = new Random();
+                Integer[] arr = new Integer[j];
+                for(int k = 0; k < j; k++) {
+                    arr[k] = random.nextInt(j);
+                }
+                Arrays.sort(arr, Collections.reverseOrder());
+                return arr;
+            };
+            double time = benchTimer.runFromSupplier(supplier, 16);
+            System.out.println("Value of N: " + i + " Order Situation- Reverse Ordered" + " Time Taken: " + time);
+        }
     }
 
     private final String description;
